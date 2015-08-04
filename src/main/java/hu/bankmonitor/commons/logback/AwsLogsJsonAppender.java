@@ -27,6 +27,12 @@ import lombok.Setter;
 @Setter
 public class AwsLogsJsonAppender extends AppenderBase<ILoggingEvent> {
 
+	static enum BatchMode {
+		none,
+		seconds,
+		count
+	};
+
 	private final ObjectMapper om;
 
 	private AWSLogsClient awsLogsClient;
@@ -43,11 +49,37 @@ public class AwsLogsJsonAppender extends AppenderBase<ILoggingEvent> {
 
 	private String logStreamName = "test-log-stream";
 
+	private BatchMode batchMode = BatchMode.none;
+
+	private int batchModeValue = 0;
+
+	private long lastUpdateMillis = 0;
+
+	List<InputLogEvent> logEvents;
 	public AwsLogsJsonAppender() {
 
 		om = new ObjectMapper();
 		om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		JacksonUtils.registerModulesToObjectMapper(om);
+	}
+
+	@Override
+	protected void append(ILoggingEvent eventObject) {
+
+		try {
+			sendEvent(om.writeValueAsString(LogbackUtils.iLoggingEvent2Map(eventObject)));
+		} catch (Exception e) {
+			e.printStackTrace();
+			addError("Error while sending a message", e);
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (logEvents.size() > 0) {
+			sendEventBatch();
+		}
+		super.stop();
 	}
 
 	@Override
@@ -62,14 +94,14 @@ public class AwsLogsJsonAppender extends AppenderBase<ILoggingEvent> {
 		try {
 			awsLogsClient.createLogGroup(createLogGroupRequest);
 		} catch (ResourceAlreadyExistsException e) {
-			addInfo("Log group already exists", e);
+			addInfo("Log group " + logGroupName + " already exists");
 		}
 
 		CreateLogStreamRequest createLogStreamRequest = new CreateLogStreamRequest(logGroupName, logStreamName);
 		try {
 			awsLogsClient.createLogStream(createLogStreamRequest);
 		} catch (ResourceAlreadyExistsException e) {
-			addInfo("Log stream already exists", e);
+			addInfo("Log stream " + logStreamName + "already exists");
 		}
 
 		try {
@@ -81,27 +113,34 @@ public class AwsLogsJsonAppender extends AppenderBase<ILoggingEvent> {
 		super.start();
 	}
 
-	@Override
-	protected void append(ILoggingEvent eventObject) {
-
-		try {
-			sendEvent(om.writeValueAsString(LogbackUtils.iLoggingEvent2Map(eventObject)));
-		} catch (Exception e) {
-			e.printStackTrace();
-			addError("Error while sending a message", e);
+	private void sendEvent(String message) {
+		addEventToBatch(message);
+		switch (batchMode) {
+			case count:
+				if (logEvents.size() >= batchModeValue) {
+					sendEventBatch();
+				}
+				break;
+			case seconds:
+				if (System.currentTimeMillis() - lastUpdateMillis > batchModeValue * 1000) {
+					sendEventBatch();
+					lastUpdateMillis = System.currentTimeMillis();
+				}
+				break;
+			default:
+				sendEventBatch();
+				break;
 		}
 	}
 
-	private void sendEvent(String message) {
-
-		List<InputLogEvent> logEvents = new LinkedList<>();
+	private void addEventToBatch(String message) {
 		logEvents.add(new InputLogEvent().withTimestamp(new Date().getTime()).withMessage(message));
+	}
 
+	private void sendEventBatch() {
 		PutLogEventsRequest putLogEventsRequest = new PutLogEventsRequest(logGroupName, logStreamName, logEvents);
 		putLogEventsRequest.setSequenceToken(lastSequenceToken);
-
 		PutLogEventsResult putLogEventsResult = awsLogsClient.putLogEvents(putLogEventsRequest);
 		lastSequenceToken = putLogEventsResult.getNextSequenceToken();
 	}
-
 }

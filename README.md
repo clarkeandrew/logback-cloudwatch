@@ -68,6 +68,8 @@ If you use [jcl-over-slf4j](http://www.slf4j.org/legacy.html) then exclude `comm
 		<awsRegionName>region</awsRegionName>
 		<logGroupName>log-group-name</logGroupName>
 		<logStreamName>log-stream-name</logStreamName>
+		<batchMode>batch-type</batchMode>
+        <batchModeValue>batch-value</batchModeValue>
 	</appender>
 
 	<root level="DEBUG">
@@ -78,12 +80,15 @@ If you use [jcl-over-slf4j](http://www.slf4j.org/legacy.html) then exclude `comm
 </configuration>
 ```
 
+
 #### Properties:
 
-| Property      | Required  | Description                                        |
-| :------------ | :-------: | :------------------------------------------------- |
-| awsAccessKey  | yes       | AWS access key                                     |
-| awsSecretKey  | yes       | AWS secret key                                     |
-| awsRegionName | no        | CloudWatch region name. Default: US_WEST_2         |
-| logGroupName  | no        | CloudWatch log group name. Default: log-group-name |
-| logStreamName | no        | CloudWatch stream name. Default: log-stream-name   |
+| Property      | Required  | Description                                              |
+| :------------ | :-------: | :------------------------------------------------------- |
+| awsAccessKey  | yes       | AWS access key                                           |
+| awsSecretKey  | yes       | AWS secret key                                           |
+| awsRegionName | no        | CloudWatch region name. Default: US_WEST_2               |
+| logGroupName  | no        | CloudWatch log group name. Default: log-group-name       |
+| logStreamName | no        | CloudWatch stream name. Default: log-stream-name         |
+| batchMode     | no        | Batch mode (seconds, count, none) Default: none          |
+| batchModeValue| no        | Batch value (interval in seconds, count) Default: 0      |

@@ -63,3 +63,8 @@ local.properties
 
 # TeXlipse plugin
 .texlipse
+
+# Intellij
+.idea
+logback-appenders.iml
+

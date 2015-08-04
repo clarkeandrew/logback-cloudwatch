@@ -40,7 +40,7 @@ public class LogbackUtils {
 		return map;
 	}
 
-	private Map<String, Object> getThrowableProxyMap(IThrowableProxy iThrowableProxy) {
+	private static Map<String, Object> getThrowableProxyMap(IThrowableProxy iThrowableProxy) {
 
 		Map<String, Object> throwableProxyMap = null;
 		if (iThrowableProxy != null) {
