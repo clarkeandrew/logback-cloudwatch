@@ -7,7 +7,7 @@ Send logs to Amazon CloudWatch Logs.
 ### Requirements:
  - Amazon IAM user with 'CloudWatchLogsFullAccess' (arn:aws:iam::aws:policy/CloudWatchLogsFullAccess) policy
 
-### Downlaod: [ ![Download](https://api.bintray.com/packages/bankmonitor/hu.bankmonitor.commons/logback-appenders/images/download.svg) ](https://bintray.com/bankmonitor/hu.bankmonitor.commons/logback-appenders/_latestVersion)
+### Download: [ ![Download](https://api.bintray.com/packages/bankmonitor/hu.bankmonitor.commons/logback-appenders/images/download.svg) ](https://bintray.com/bankmonitor/hu.bankmonitor.commons/logback-appenders/_latestVersion)
 
 ### Maven:
 

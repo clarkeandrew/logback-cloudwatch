@@ -57,7 +57,7 @@ public class AwsLogsJsonAppender extends AppenderBase<ILoggingEvent> {
 
 	List<InputLogEvent> logEvents;
 	public AwsLogsJsonAppender() {
-
+		logEvents = new LinkedList<>();
 		om = new ObjectMapper();
 		om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		JacksonUtils.registerModulesToObjectMapper(om);
