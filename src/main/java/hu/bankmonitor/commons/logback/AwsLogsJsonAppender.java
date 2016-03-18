@@ -123,5 +123,6 @@ public class AwsLogsJsonAppender extends AppenderBase<ILoggingEvent> {
         putLogEventsRequest.setSequenceToken(lastSequenceToken);
         PutLogEventsResult putLogEventsResult = awsLogsClient.putLogEvents(putLogEventsRequest);
         lastSequenceToken = putLogEventsResult.getNextSequenceToken();
+        logEvents.clear();
     }
 }
